@@ -5,7 +5,7 @@ const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'))
 
 export default [
 	{
-		input: 'src/parse-boolean.ts',
+		input: 'src/index.ts',
 		plugins: [ typescript() ],
 		output: [
 			{ file: pkg.main, format: 'cjs' },
