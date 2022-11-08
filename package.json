@@ -1,0 +1,44 @@
+{
+  "name": "@marianmeres/parse-boolean",
+  "version": "1.0.0",
+  "description": "Parses boolean like notation.",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "exports": {
+    "require": "./dist/index.cjs",
+    "import": "./dist/index.js"
+  },
+  "scripts": {
+    "clean": "rimraf dist/*",
+    "prettier": "prettier --write \"{src,tests}/**/*.{js,ts,json}\"",
+    "release": "release",
+    "test": "test-runner",
+    "build": "npm run clean && rollup -c"
+  },
+  "files": [
+    "dist"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/marianmeres/parse-boolean.git"
+  },
+  "keywords": [
+    "boolean"
+  ],
+  "author": "Marian Meres <marian@meres.sk>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/marianmeres/parse-boolean/issues"
+  },
+  "homepage": "https://github.com/marianmeres/parse-boolean#readme",
+  "devDependencies": {
+    "@marianmeres/release": "^0.0.7",
+    "@marianmeres/test-runner": "^2.0.13",
+    "@rollup/plugin-typescript": "^9.0.2",
+    "@types/node": "^18.11.9",
+    "rimraf": "^3.0.2",
+    "rollup": "^3.2.5",
+    "tslib": "^2.4.1"
+  }
+}
