@@ -19,6 +19,7 @@ const parseBoolean = (val) => {
         case 'yes':
         case 'y':
         case 'true':
+        case 't': // postgresql boolean conventions
         case 'ok':
         case 'on':
         case 'enabled':

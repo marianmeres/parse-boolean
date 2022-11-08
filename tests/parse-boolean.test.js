@@ -42,7 +42,7 @@ suite.test('FALSE: ints, floats (written as strings)', () => {
 });
 
 suite.test('TRUE: whitelisted strings', () => {
-	['1', 'oN', 'tRUe', 'eNabLEd', 'Ok', 'yES', 'y'].forEach((v) =>
+	['1', 'oN', 'tRUe', 'eNabLEd', 'Ok', 'yES', 'y', 't'].forEach((v) =>
 		assert(parseBoolean(v))
 	);
 });

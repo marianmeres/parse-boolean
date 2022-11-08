@@ -1,7 +1,7 @@
 # @marianmeres/parse-boolean
 
-Parses any value as boolean. Understands few english truthy words like
-`on`, `enabled`, `yes`, `y` and `ok`.
+Parses any value as boolean. Understands few english truthy-like words like
+`true`, `on`, `enabled`, `yes`, `y`, `ok` and `t`.
 
 ## Install
 ```shell
