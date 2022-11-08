@@ -1,6 +1,6 @@
 {
   "name": "@marianmeres/parse-boolean",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Parses boolean like notation.",
   "type": "module",
   "main": "./dist/index.cjs",
