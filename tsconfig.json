@@ -16,7 +16,8 @@
 		"pretty": true,
 		"skipLibCheck": true,
 		"strict": false,
-		"forceConsistentCasingInFileNames": true
+		"forceConsistentCasingInFileNames": true,
+		"declaration": true
 	}
 
 }
