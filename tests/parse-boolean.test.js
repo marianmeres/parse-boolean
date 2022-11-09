@@ -7,7 +7,9 @@ import { parseBoolean } from '../dist/index.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const suite = new TestRunner(path.basename(__filename));
+const suite = new TestRunner(path.basename(__filename), {
+	beforeEach: () => (parseBoolean.truthy = []),
+});
 
 suite.test('booleans', () => {
 	assert(parseBoolean(true));
@@ -48,7 +50,7 @@ suite.test('TRUE: whitelisted strings', () => {
 });
 
 suite.test('FALSE: every other string', () => {
-	['', '  ', 'foo', 'truthy'].forEach((v) => assert(!parseBoolean(v)));
+	['', '  ', 'foo', 'truthy', 'yo'].forEach((v) => assert(!parseBoolean(v)));
 });
 
 suite.test('TRUE: anything js truthy', () => {
@@ -57,6 +59,12 @@ suite.test('TRUE: anything js truthy', () => {
 
 suite.test('FALSE: anything js falsey', () => {
 	[void 0, null, NaN].forEach((v) => assert(!parseBoolean(v)));
+});
+
+suite.test('Custom dictionary', () => {
+	assert(!parseBoolean('yo'));
+	parseBoolean.truthy.push('yo');
+	assert(parseBoolean('YO'));
 });
 
 export default suite;

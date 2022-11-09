@@ -2,10 +2,14 @@
 
 A little utility which parses any input to `boolean`. Note that **it does not always
 simply convert** the input (as `!!val`) but rather adds more human-like touch to the
-decision. Put it in another words, it understands few english truthy-like words such as
+decision. In another words, it understands few english truthy-like words such as
 `true`, `on`, `enabled`, `yes`, `y`, `ok` and `t`.
 
-Mainly usefull for string inputs conversion (e.g. text config files, form values, ...)
+The truthy words dictionary can be globally extended to your own needs (e.g. to add words
+in a different language).
+
+Mainly usefull for string-to-boolean conversion from text config files, html form
+values, or similar...
 
 ## Install
 ```shell
@@ -29,4 +33,15 @@ parseBoolean('-0.0')  // false
 parseBoolean('NO')    // false
 parseBoolean(NaN)     // false
 parseBoolean(123)     // true
+```
+
+## Custom dictionary example
+
+```javascript
+parseBoolean('yo')  // false
+
+// note, that the added words MUST be lowercased to work correctly
+parseBoolean.truthy.push('yo')
+
+parseBoolean('YO')  // true
 ```

@@ -26,6 +26,14 @@ export const parseBoolean = (val: any): boolean => {
 		case 'enabled':
 			return true;
 		default:
+			// do we have a custom valid dictionary?
+			if (Array.isArray(parseBoolean.truthy)) {
+				return parseBoolean.truthy.includes(val);
+			}
+			// all false here...
 			return false;
 	}
 };
+
+// custom truthy words extended dictionary
+parseBoolean.truthy = [];
