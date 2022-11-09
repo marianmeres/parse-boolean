@@ -1,4 +1,5 @@
 export declare const parseBoolean: {
     (val: any): boolean;
-    truthy: any[];
+    addTruthy(v: string): Set<string>;
+    reset(): Set<string>;
 };

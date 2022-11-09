@@ -1,39 +1,18 @@
+const _defaults = ['yes', 'y', 'true', 't', 'ok', 'on', 'enabled'];
+let _truthy = new Set(_defaults);
 const parseBoolean = (val) => {
-    // booleans
-    if (typeof val === 'boolean')
-        return val;
-    // integers
-    if (Number.isInteger(val))
-        return val !== 0;
     // non-strings
     if (typeof val !== 'string')
         return !!val;
-    // normalize string
-    val = val.toLowerCase().trim();
     // maybe numeric string?
     const num = parseFloat(val);
     if (!isNaN(num))
-        return num !== 0;
-    // true only few whitelisted, all else false
-    switch (val) {
-        case 'yes':
-        case 'y':
-        case 'true':
-        case 't': // postgresql-like boolean convention
-        case 'ok':
-        case 'on':
-        case 'enabled':
-            return true;
-        default:
-            // do we have a custom valid dictionary?
-            if (Array.isArray(parseBoolean.truthy)) {
-                return parseBoolean.truthy.includes(val);
-            }
-            // all false here...
-            return false;
-    }
+        return !!num;
+    // prettier-ignore
+    return _truthy.has(val.toLowerCase().trim());
 };
 // custom truthy words extended dictionary
-parseBoolean.truthy = [];
+parseBoolean.addTruthy = (v) => _truthy.add(`${v}`.toLowerCase().trim());
+parseBoolean.reset = () => (_truthy = new Set(_defaults));
 
 export { parseBoolean };

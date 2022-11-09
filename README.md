@@ -39,9 +39,6 @@ parseBoolean(123)     // true
 
 ```javascript
 parseBoolean('yo')  // false
-
-// note, that the added words MUST be lowercased to work correctly
-parseBoolean.truthy.push('yo')
-
+parseBoolean.addTruthy('yo');
 parseBoolean('YO')  // true
 ```
