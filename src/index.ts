@@ -9,11 +9,10 @@ export const parseBoolean = (val: any): boolean => {
 	const num = parseFloat(val);
 	if (!isNaN(num)) return !!num;
 
-	// prettier-ignore
 	return _truthy.has(val.toLowerCase().trim());
 };
 
-// 
+//
 parseBoolean.addTruthy = (v: string) => _truthy.add(`${v}`.toLowerCase().trim());
 
 //

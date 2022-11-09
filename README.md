@@ -1,12 +1,11 @@
 # @marianmeres/parse-boolean
 
-A little utility which parses any input to `boolean`. Note that **it does not always
-simply convert** the input (as `!!val`) but rather adds more human-like touch to the
-decision. In another words, it understands few english truthy-like words such as
-`true`, `on`, `enabled`, `yes`, `y`, `ok` and `t`.
+A little utility which parses any input to `boolean`. Almost as simple as `(v) => !!v`
+except that it differently handles strings.
 
-The truthy words dictionary can be globally extended to your own needs (e.g. to add words
-in a different language).
+Only truthy strings are `true`, `t`, `yes`, `y`, `on`, `ok`, `enabled` and numeric ones
+except zero. All others are considered falsey. This dictionary can be globally extended
+to your own needs. Case insensitive.
 
 Mainly useful for string-to-boolean conversion from text config files, html form
 values, or similar...
@@ -23,14 +22,14 @@ parseBoolean(value: any): boolean
 
 ## Examples
 ```javascript
-parseBoolean('')      // false
-parseBoolean('foo')   // false
 parseBoolean('yEs')   // true
 parseBoolean('ON')    // true
-parseBoolean('{}')    // false
-parseBoolean({})      // true
+parseBoolean('')      // false
+parseBoolean('foo')   // false
 parseBoolean('-0.0')  // false
-parseBoolean('NO')    // false
+parseBoolean('{}')    // false
+// all non-strings are casted as !!v
+parseBoolean({})      // true
 parseBoolean(NaN)     // false
 parseBoolean(123)     // true
 ```

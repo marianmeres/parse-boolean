@@ -10,11 +10,11 @@ const parseBoolean = (val) => {
     const num = parseFloat(val);
     if (!isNaN(num))
         return !!num;
-    // prettier-ignore
     return _truthy.has(val.toLowerCase().trim());
 };
-// custom truthy words extended dictionary
+//
 parseBoolean.addTruthy = (v) => _truthy.add(`${v}`.toLowerCase().trim());
+//
 parseBoolean.reset = () => (_truthy = new Set(_defaults));
 
 exports.parseBoolean = parseBoolean;
