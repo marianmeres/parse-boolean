@@ -8,7 +8,7 @@ decision. In another words, it understands few english truthy-like words such as
 The truthy words dictionary can be globally extended to your own needs (e.g. to add words
 in a different language).
 
-Mainly usefull for string-to-boolean conversion from text config files, html form
+Mainly useful for string-to-boolean conversion from text config files, html form
 values, or similar...
 
 ## Install
