@@ -20,7 +20,7 @@ export const parseBoolean = (val: any): boolean => {
 		case 'yes':
 		case 'y':
 		case 'true':
-		case 't': // postgresql boolean conventions
+		case 't': // postgresql-like boolean convention
 		case 'ok':
 		case 'on':
 		case 'enabled':
