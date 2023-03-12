@@ -1,6 +1,6 @@
 {
   "name": "@marianmeres/parse-boolean",
-  "version": "1.1.3",
+  "version": "1.1.4",
   "description": "Parses boolean like notation.",
   "type": "module",
   "main": "./dist/index.cjs",
@@ -16,6 +16,7 @@
     "test": "test-runner",
     "build": "npm run clean && rollup -c"
   },
+  "types": "./dist/index.d.ts",
   "files": [
     "dist"
   ],
@@ -33,7 +34,7 @@
   },
   "homepage": "https://github.com/marianmeres/parse-boolean#readme",
   "devDependencies": {
-    "@marianmeres/release": "^0.0.7",
+    "@marianmeres/release": "^0.0.9",
     "@marianmeres/test-runner": "^2.0.13",
     "@rollup/plugin-typescript": "^9.0.2",
     "@types/node": "^18.11.9",
