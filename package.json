@@ -34,7 +34,7 @@
   },
   "homepage": "https://github.com/marianmeres/parse-boolean#readme",
   "devDependencies": {
-    "@marianmeres/release": "^0.0.9",
+    "@marianmeres/release": "^1.0.0",
     "@marianmeres/test-runner": "^2.0.13",
     "@rollup/plugin-typescript": "^9.0.2",
     "@types/node": "^18.11.9",
