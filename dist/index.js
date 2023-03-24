@@ -6,7 +6,7 @@ const parseBoolean = (val) => {
         return !!val;
     // maybe numeric string?
     const num = parseFloat(val);
-    if (!isNaN(num))
+    if (!Number.isNaN(num))
         return !!num;
     return _truthy.has(val.toLowerCase().trim());
 };
