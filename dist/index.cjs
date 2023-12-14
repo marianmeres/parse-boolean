@@ -1,6 +1,6 @@
 'use strict';
 
-const _defaults = ['yes', 'y', 'true', 't', 'ok', 'on', 'enabled'];
+const _defaults = ['yes', 'y', 'true', 't', 'ok', 'on', 'enable', 'enabled'];
 let _truthy = new Set(_defaults);
 const parseBoolean = (val) => {
     // non-strings

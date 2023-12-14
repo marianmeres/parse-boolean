@@ -11,7 +11,7 @@ const suite = new TestRunner(path.basename(fileURLToPath(import.meta.url)), {
 // prettier-ignore
 suite.test('TRUE', () => {
 	[   {}, new Date(), () => null, true, 1, -1, 0.1, -0.1,
-		'1', 'oN', 'tRUe', 'eNabLEd', 'Ok', 'yES', 'y', 't',
+		'1', 'oN', 'tRUe', 'eNabLEd', 'enable', 'Ok', 'yES', 'y', 't',
 	].forEach((v) => assert(parseBoolean(v), `Expecting true for: '${v}'`));
 });
 
