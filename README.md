@@ -12,8 +12,11 @@ values, or similar...
 
 ## Install
 
-```shell
-$ npm i @marianmeres/parse-boolean
+```sh
+deno add jsr:@marianmeres/parse-boolean
+```
+```sh
+npm install @marianmeres/parse-boolean
 ```
 
 ## Usage
@@ -37,10 +40,41 @@ parseBoolean(NaN); // false
 parseBoolean(123); // true
 ```
 
-## Custom dictionary example
+## Custom dictionary
+
+You can extend the truthy dictionary with your own values:
 
 ```javascript
 parseBoolean('yo'); // false
 parseBoolean.addTruthy('yo');
-parseBoolean('YO'); // true
+parseBoolean('YO'); // true (case insensitive)
 ```
+
+Reset the dictionary to remove all custom values:
+
+```javascript
+parseBoolean.addTruthy('custom');
+parseBoolean('custom'); // true
+parseBoolean.reset();
+parseBoolean('custom'); // false
+parseBoolean('yes'); // true (default values still work)
+```
+
+## API
+
+### `parseBoolean(value: any): boolean`
+
+Parses any input value to a boolean.
+
+- **Non-string values**: Uses standard JavaScript truthy/falsy conversion (`!!value`)
+- **Numeric strings**: Parsed as numbers (zero is false, non-zero is true)
+- **String dictionary**: `"true"`, `"t"`, `"yes"`, `"y"`, `"on"`, `"ok"`, `"enable"`, `"enabled"` (case insensitive)
+- **All other strings**: Considered falsy
+
+### `parseBoolean.addTruthy(value: string): void`
+
+Adds a custom string to the truthy dictionary. Values are normalized (lowercased and trimmed).
+
+### `parseBoolean.reset(): void`
+
+Resets the truthy dictionary to default values, removing all custom additions.
