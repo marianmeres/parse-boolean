@@ -1,5 +1,5 @@
 const _defaults = ["yes", "y", "true", "t", "ok", "on", "enable", "enabled"];
-let _truthy = new Set(_defaults);
+let _truthy: Set<string> = new Set(_defaults);
 
 /**
  * Parses any input value to a boolean.
@@ -50,7 +50,7 @@ export function parseBoolean(val: any): boolean {
  * parseBoolean('CUSTOM');           // true (case insensitive)
  * ```
  */
-parseBoolean.addTruthy = (v: string) =>
+parseBoolean.addTruthy = (v: string): Set<string> =>
 	_truthy.add(`${v}`.toLowerCase().trim());
 
 /**
@@ -65,4 +65,4 @@ parseBoolean.addTruthy = (v: string) =>
  * parseBoolean('custom');  // false
  * ```
  */
-parseBoolean.reset = () => (_truthy = new Set(_defaults));
+parseBoolean.reset = (): Set<string> => (_truthy = new Set(_defaults));
