@@ -1,0 +1,189 @@
+# @marianmeres/parse-boolean - LLM Context File
+
+## Package Overview
+
+name: @marianmeres/parse-boolean
+version: 2.0.1
+author: Marian Meres
+license: MIT
+repository: https://github.com/marianmeres/parse-boolean
+npm: https://www.npmjs.com/package/@marianmeres/parse-boolean
+jsr: https://jsr.io/@marianmeres/parse-boolean
+
+## Purpose
+
+A utility function that parses any input value to a boolean. Unlike simple `!!value` conversion, it provides special handling for strings to enable intuitive boolean parsing from text sources like config files, HTML form values, environment variables, etc.
+
+## Technical Stack
+
+runtime: Deno (primary), Node.js (via npm build)
+language: TypeScript
+module_system: ES Modules
+testing_framework: Deno.test with @std/assert
+build_tool: Custom script using Deno
+
+## Project Structure
+
+```
+/
+├── src/
+│   ├── mod.ts              # Entry point, re-exports parse-boolean.ts
+│   └── parse-boolean.ts    # Main implementation (~70 lines)
+├── tests/
+│   └── parse-boolean.test.ts   # Test suite
+├── scripts/
+│   └── build-npm.ts        # NPM package build script
+├── .npm-dist/              # Generated NPM distribution (gitignored)
+├── deno.json               # Deno configuration and package metadata
+├── deno.lock               # Dependency lock file
+├── LICENSE                 # MIT License
+├── README.md               # Documentation
+├── .editorconfig           # Editor settings (tabs, utf-8, lf)
+└── .gitignore
+```
+
+## Core API
+
+### parseBoolean(value: any): boolean
+
+Main function that converts any value to boolean.
+
+Behavior:
+- Non-string values: Standard JavaScript truthy/falsy conversion (!!value)
+- Numeric strings: Parsed as float, then converted (0 is false, non-zero is true)
+- String dictionary: Case-insensitive match against truthy set returns true
+- Other strings: Returns false
+
+Default truthy strings: "yes", "y", "true", "t", "ok", "on", "enable", "enabled"
+
+### parseBoolean.addTruthy(value: string): Set<string>
+
+Adds a custom string to the truthy dictionary. Values are normalized (lowercased and trimmed).
+Returns the modified Set.
+
+### parseBoolean.reset(): Set<string>
+
+Resets the truthy dictionary to default values, removing all custom additions.
+Returns the new Set.
+
+## Implementation Details
+
+file: src/parse-boolean.ts
+lines: 69 total
+
+Key internals:
+- _defaults: Immutable array of default truthy strings
+- _truthy: Mutable Set containing current truthy strings (starts as copy of _defaults)
+- Uses parseFloat() for numeric string detection
+- String matching is case-insensitive and trimmed
+
+Algorithm:
+1. If not a string, return !!value
+2. If parseable as number, return !!parseFloat(value)
+3. Return _truthy.has(value.toLowerCase().trim())
+
+## Test Cases
+
+file: tests/parse-boolean.test.ts
+
+Truthy test cases:
+- Objects: {}, new Date(), () => null
+- Primitives: true, 1, -1, 0.1, -0.1
+- Strings: "1", "oN", "tRUe", "eNabLEd", "enable", "ENABLE", "Ok", "yES", "y", "t"
+
+Falsy test cases:
+- Primitives: undefined, null, NaN, false, 0, 0.0, -0, -0.0
+- Strings: "", "  ", "gimme some truth", "yo"
+
+Additional tests:
+- Custom dictionary: addTruthy() adds custom truthy strings
+- Reset: reset() restores default behavior
+
+## Dependencies
+
+Production: None (zero dependencies)
+
+Development (Deno):
+- @deno/dnt: ^0.41.3 (not currently used, build script is custom)
+- @std/assert: ^1.0.16
+- @std/fs: ^1.0.20
+- @std/path: ^1.1.3
+
+## Build & Publish
+
+### Deno/JSR
+
+```sh
+# Run tests
+deno test
+
+# Run tests in watch mode
+deno task test
+
+# Publish to JSR (manual via jsr.io or deno publish)
+```
+
+### NPM
+
+```sh
+# Build npm package
+deno task npm:build
+
+# Build and publish to npm
+deno task npm:publish
+```
+
+Build process (scripts/build-npm.ts):
+1. Creates .npm-dist/ directory
+2. Copies src/ with .ts -> .js import rewrites
+3. Generates tsconfig.json, package.json
+4. Runs npm install && tsc
+5. Cleans up intermediate files
+6. Output: .npm-dist/dist/ with .js and .d.ts files
+
+## Code Style
+
+- Indentation: Tabs
+- Line width: 90 characters
+- End of line: LF
+- Final newline: Yes
+- Lint: no-explicit-any rule disabled
+
+## Version History
+
+v2.0.0: Migrated from Node.js to Deno
+v2.0.1: Typings fix
+v1.1.7: Last Node.js-based version
+
+## Usage Examples
+
+```typescript
+import { parseBoolean } from "@marianmeres/parse-boolean";
+
+// Basic usage
+parseBoolean('yes');     // true
+parseBoolean('ON');      // true
+parseBoolean('1');       // true
+parseBoolean('');        // false
+parseBoolean('foo');     // false
+parseBoolean({});        // true (non-string truthy)
+parseBoolean(null);      // false
+
+// Custom dictionary
+parseBoolean('custom');           // false
+parseBoolean.addTruthy('custom');
+parseBoolean('CUSTOM');           // true
+
+// Reset to defaults
+parseBoolean.reset();
+parseBoolean('custom');           // false
+```
+
+## Notes for LLMs
+
+- This is a simple, focused utility with no external runtime dependencies
+- The codebase is small (~70 lines of implementation)
+- Primary use case: parsing user input, config values, form data to booleans
+- The global mutable state (_truthy Set) is intentional for API simplicity
+- Build system is custom (not using dnt despite it being in dependencies)
+- Package is dual-published to JSR (for Deno) and NPM (for Node.js)

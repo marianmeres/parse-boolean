@@ -1,5 +1,8 @@
 # @marianmeres/parse-boolean
 
+[![NPM version](https://img.shields.io/npm/v/@marianmeres/parse-boolean.svg)](https://www.npmjs.com/package/@marianmeres/parse-boolean)
+[![JSR version](https://jsr.io/badges/@marianmeres/parse-boolean)](https://jsr.io/@marianmeres/parse-boolean)
+
 A little utility which parses any input to `boolean`. Almost as simple as `(v) => !!v`
 except that it differently handles strings.
 
@@ -78,3 +81,10 @@ Adds a custom string to the truthy dictionary. Values are normalized (lowercased
 ### `parseBoolean.reset(): void`
 
 Resets the truthy dictionary to default values, removing all custom additions.
+
+## Package Identity
+
+- **Name:** @marianmeres/parse-boolean
+- **Author:** Marian Meres
+- **Repository:** https://github.com/marianmeres/parse-boolean
+- **License:** MIT
