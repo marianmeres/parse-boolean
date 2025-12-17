@@ -42,12 +42,15 @@ Deno.test("FALSE", () => {
 });
 
 Deno.test("Custom dictionary", () => {
+	parseBoolean.reset();
 	assert(!parseBoolean("yo"));
 	parseBoolean.addTruthy("yo"); // case insensitive
 	assert(parseBoolean("yO"));
+	parseBoolean.reset();
 });
 
 Deno.test("Reset dictionary", () => {
+	parseBoolean.reset();
 	parseBoolean.addTruthy("custom");
 	assert(parseBoolean("custom"));
 	parseBoolean.reset();
@@ -55,4 +58,5 @@ Deno.test("Reset dictionary", () => {
 	// default values should still work after reset
 	assert(parseBoolean("yes"));
 	assert(parseBoolean("true"));
+	parseBoolean.reset();
 });

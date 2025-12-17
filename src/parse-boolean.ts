@@ -1,5 +1,21 @@
+/** Default string values considered truthy (case-insensitive). */
 const _defaults = ["yes", "y", "true", "t", "ok", "on", "enable", "enabled"];
-let _truthy: Set<string> = new Set(_defaults);
+
+/**
+ * Global registry key for shared state across module instances.
+ * Using Symbol.for() ensures the same symbol is used even if the module
+ * is duplicated by bundlers or multiple versions coexist.
+ */
+const GLOBAL_KEY = Symbol.for("@marianmeres/parse-boolean");
+
+/**
+ * Global state object storing the truthy dictionary.
+ * Attached to globalThis to ensure state is shared across all imports,
+ * preventing issues with duplicate module instances.
+ */
+const GLOBAL = ((globalThis as any)[GLOBAL_KEY] ??= {
+	_truthy: new Set(_defaults),
+});
 
 /**
  * Parses any input value to a boolean.
@@ -34,7 +50,7 @@ export function parseBoolean(val: any): boolean {
 	const num = parseFloat(val);
 	if (!Number.isNaN(num)) return !!num;
 
-	return _truthy.has(val.toLowerCase().trim());
+	return GLOBAL._truthy.has(val.toLowerCase().trim());
 }
 
 /**
@@ -51,7 +67,7 @@ export function parseBoolean(val: any): boolean {
  * ```
  */
 parseBoolean.addTruthy = (v: string): Set<string> =>
-	_truthy.add(`${v}`.toLowerCase().trim());
+	GLOBAL._truthy.add(`${v}`.toLowerCase().trim());
 
 /**
  * Resets the truthy dictionary to its default values.
@@ -65,4 +81,7 @@ parseBoolean.addTruthy = (v: string): Set<string> =>
  * parseBoolean('custom');  // false
  * ```
  */
-parseBoolean.reset = (): Set<string> => (_truthy = new Set(_defaults));
+parseBoolean.reset = (): Set<string> => {
+	GLOBAL._truthy = new Set(_defaults);
+	return GLOBAL._truthy;
+};
