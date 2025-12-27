@@ -13,6 +13,7 @@ const GLOBAL_KEY = Symbol.for("@marianmeres/parse-boolean");
  * Attached to globalThis to ensure state is shared across all imports,
  * preventing issues with duplicate module instances.
  */
+// deno-lint-ignore no-explicit-any
 const GLOBAL = ((globalThis as any)[GLOBAL_KEY] ??= {
 	_truthy: new Set(_defaults),
 });
@@ -42,7 +43,7 @@ const GLOBAL = ((globalThis as any)[GLOBAL_KEY] ??= {
  * parseBoolean(NaN);       // false (non-string, falsy value)
  * ```
  */
-export function parseBoolean(val: any): boolean {
+export function parseBoolean(val: unknown): boolean {
 	// non-strings
 	if (typeof val !== "string") return !!val;
 
