@@ -1,0 +1,1 @@
+Parses any value to boolean with intelligent string handling — recognizes "yes", "true", "on", "enabled", etc. Useful for config files, env vars, and form values.
