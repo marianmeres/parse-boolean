@@ -1,5 +1,93 @@
 /** Default string values considered truthy (case-insensitive). */
-const _defaults = ["yes", "y", "true", "t", "ok", "on", "enable", "enabled"];
+const _defaultTruthy = ["yes", "y", "true", "t", "ok", "on", "enable", "enabled"];
+
+/** Default string values considered falsy (case-insensitive). Used only by strict mode. */
+const _defaultFalsy = ["no", "n", "false", "f", "off", "disable", "disabled"];
+
+/** Matches syntactically valid finite decimal numbers (no hex, no Infinity, no NaN). */
+const NUMERIC_RE = /^[+-]?(\d+\.?\d*|\.\d+)([eE][+-]?\d+)?$/;
+
+/** Options for a single parse call. */
+export interface ParseBooleanOptions {
+	/**
+	 * If true, throws TypeError for strings that are neither numeric nor
+	 * recognized in the truthy/falsy dictionaries. Defaults to false.
+	 */
+	strict?: boolean;
+}
+
+/** The shape of a parseBoolean instance (both the global and factory-produced ones). */
+export interface ParseBoolean {
+	(val: unknown, options?: ParseBooleanOptions): boolean;
+	addTruthy: (v: string) => void;
+	removeTruthy: (v: string) => void;
+	addFalsy: (v: string) => void;
+	removeFalsy: (v: string) => void;
+	reset: () => void;
+}
+
+function normalize(v: string): string {
+	return v.toLowerCase().trim();
+}
+
+/**
+ * Creates an isolated parseBoolean instance with its own truthy/falsy dictionaries.
+ *
+ * Useful when different parts of an application need different boolean vocabularies
+ * and should not share state through the global instance.
+ *
+ * @example
+ * ```ts
+ * const parse = createParseBoolean();
+ * parse.addTruthy("si");
+ * parse("si"); // true
+ * ```
+ */
+export function createParseBoolean(): ParseBoolean {
+	let truthy = new Set(_defaultTruthy);
+	let falsy = new Set(_defaultFalsy);
+
+	const fn = ((val: unknown, options?: ParseBooleanOptions): boolean => {
+		if (typeof val !== "string") return !!val;
+
+		const s = normalize(val);
+
+		if (NUMERIC_RE.test(s)) {
+			const num = Number(s);
+			if (Number.isFinite(num)) return num !== 0;
+		}
+
+		if (truthy.has(s)) return true;
+
+		if (options?.strict) {
+			if (falsy.has(s)) return false;
+			throw new TypeError(
+				`parseBoolean: unrecognized value in strict mode: ${JSON.stringify(val)}`,
+			);
+		}
+
+		return false;
+	}) as ParseBoolean;
+
+	fn.addTruthy = (v: string): void => {
+		truthy.add(normalize(`${v}`));
+	};
+	fn.removeTruthy = (v: string): void => {
+		truthy.delete(normalize(`${v}`));
+	};
+	fn.addFalsy = (v: string): void => {
+		falsy.add(normalize(`${v}`));
+	};
+	fn.removeFalsy = (v: string): void => {
+		falsy.delete(normalize(`${v}`));
+	};
+	fn.reset = (): void => {
+		truthy = new Set(_defaultTruthy);
+		falsy = new Set(_defaultFalsy);
+	};
+
+	return fn;
+}
 
 /**
  * Global registry key for shared state across module instances.
@@ -8,81 +96,39 @@ const _defaults = ["yes", "y", "true", "t", "ok", "on", "enable", "enabled"];
  */
 const GLOBAL_KEY = Symbol.for("@marianmeres/parse-boolean");
 
-/**
- * Global state object storing the truthy dictionary.
- * Attached to globalThis to ensure state is shared across all imports,
- * preventing issues with duplicate module instances.
- */
 // deno-lint-ignore no-explicit-any
-const GLOBAL = ((globalThis as any)[GLOBAL_KEY] ??= {
-	_truthy: new Set(_defaults),
-});
+const globalRegistry = globalThis as any;
 
 /**
  * Parses any input value to a boolean.
  *
  * For non-string values, uses standard truthy/falsy JavaScript conversion (!!val).
- * For strings, applies special parsing rules:
- * - Numeric strings are parsed as numbers and then converted (zero is false)
- * - Specific truthy strings: "true", "t", "yes", "y", "on", "ok", "enable", "enabled"
- * - All other strings are considered falsy
- * - Case insensitive and trimmed
+ * For strings, applies special parsing rules (case-insensitive, trimmed):
+ * - Finite decimal numeric strings: zero is false, non-zero is true.
+ *   Partial numeric strings like "123abc" are not numeric and fall through.
+ *   Non-finite values ("Infinity", "NaN") are not numeric and fall through.
+ * - Recognized truthy strings: "true", "t", "yes", "y", "on", "ok",
+ *   "enable", "enabled" (extensible via `addTruthy`).
+ * - In non-strict mode (default), all other strings are falsy.
+ * - In strict mode (`{ strict: true }`), strings that match neither the
+ *   truthy nor the falsy dictionary throw `TypeError`.
  *
- * @param val - The value to parse (can be any type)
- * @returns The parsed boolean value
- *
- * @example
- * ```ts
- * parseBoolean('yes');     // true
- * parseBoolean('ON');      // true
- * parseBoolean('1');       // true
- * parseBoolean('');        // false
- * parseBoolean('foo');     // false
- * parseBoolean('-0.0');    // false
- * parseBoolean({});        // true (non-string, truthy object)
- * parseBoolean(NaN);       // false (non-string, falsy value)
- * ```
- */
-export function parseBoolean(val: unknown): boolean {
-	// non-strings
-	if (typeof val !== "string") return !!val;
-
-	// maybe numeric string?
-	const num = parseFloat(val);
-	if (!Number.isNaN(num)) return !!num;
-
-	return GLOBAL._truthy.has(val.toLowerCase().trim());
-}
-
-/**
- * Adds a custom string value to the truthy dictionary.
- * The value will be normalized (lowercased and trimmed) before being added.
- *
- * @param v - The string value to add to the truthy dictionary
+ * State (truthy/falsy dictionaries) is stored on `globalThis` under a
+ * `Symbol.for` key so customizations are shared across bundler-duplicated
+ * copies of this module. For isolated state, use `createParseBoolean()`.
  *
  * @example
  * ```ts
- * parseBoolean('custom');           // false
- * parseBoolean.addTruthy('custom');
- * parseBoolean('CUSTOM');           // true (case insensitive)
+ * parseBoolean("yes");                        // true
+ * parseBoolean("ON");                         // true
+ * parseBoolean("1");                          // true
+ * parseBoolean("");                           // false
+ * parseBoolean("foo");                        // false
+ * parseBoolean("-0.0");                       // false
+ * parseBoolean({});                           // true
+ * parseBoolean(NaN);                          // false
+ * parseBoolean("maybe", { strict: true });    // throws TypeError
  * ```
  */
-parseBoolean.addTruthy = (v: string): Set<string> =>
-	GLOBAL._truthy.add(`${v}`.toLowerCase().trim());
-
-/**
- * Resets the truthy dictionary to its default values.
- * Removes all custom values added via addTruthy().
- *
- * @example
- * ```ts
- * parseBoolean.addTruthy('custom');
- * parseBoolean('custom');  // true
- * parseBoolean.reset();
- * parseBoolean('custom');  // false
- * ```
- */
-parseBoolean.reset = (): Set<string> => {
-	GLOBAL._truthy = new Set(_defaults);
-	return GLOBAL._truthy;
-};
+export const parseBoolean: ParseBoolean = (globalRegistry[GLOBAL_KEY] ??=
+	createParseBoolean());
