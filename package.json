@@ -1,6 +1,6 @@
 {
   "name": "@marianmeres/parse-boolean",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "description": "Parses any value to a boolean, with deliberate string handling (\"yes\", \"on\", \"1\", ...). Library and CLI.",
   "license": "MIT",
   "author": "Marian Meres",
