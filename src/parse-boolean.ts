@@ -96,8 +96,7 @@ export function createParseBoolean(): ParseBoolean {
  */
 const GLOBAL_KEY = Symbol.for("@marianmeres/parse-boolean");
 
-// deno-lint-ignore no-explicit-any
-const globalRegistry = globalThis as any;
+const globalRegistry = globalThis as unknown as Record<symbol, ParseBoolean | undefined>;
 
 /**
  * Parses any input value to a boolean.
@@ -130,5 +129,6 @@ const globalRegistry = globalThis as any;
  * parseBoolean("maybe", { strict: true });    // throws TypeError
  * ```
  */
+// biome-ignore lint/suspicious/noAssignInExpressions: reuse the instance another copy of this module already registered
 export const parseBoolean: ParseBoolean = (globalRegistry[GLOBAL_KEY] ??=
 	createParseBoolean());

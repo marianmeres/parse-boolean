@@ -1,0 +1,8 @@
+{
+  "name": "@marianmeres/parse-boolean",
+  "exports": "./src/index.ts",
+  "publish": {
+    "include": ["src/**/*.ts", "README.md", "LICENSE"],
+    "exclude": ["src/bin.ts", "src/cli.ts"]
+  }
+}

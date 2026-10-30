@@ -16,11 +16,12 @@ values, or similar...
 ## Install
 
 ```sh
-deno add jsr:@marianmeres/parse-boolean
+npm install @marianmeres/parse-boolean    # or pnpm add
+deno add jsr:@marianmeres/parse-boolean   # Deno
 ```
-```sh
-npm install @marianmeres/parse-boolean
-```
+
+Zero dependencies. Runs anywhere (Node, browsers, Deno). The [CLI](#cli) needs Node
+(>= 24.12).
 
 ## Usage
 
@@ -108,6 +109,39 @@ parse('si');         // true
 parseBoolean('si');  // false (global is untouched)
 ```
 
+## CLI
+
+The npm package also ships a `parse-boolean` binary. It prints `true` or `false`, and
+its exit code carries the same answer, like `grep`: **0 = true, 1 = false, 2 = error**
+(invalid arguments, or an unrecognized value with `--strict`). So it works directly in
+shell conditions:
+
+```sh
+npx @marianmeres/parse-boolean yes        # prints "true", exit 0
+
+if parse-boolean -q -- "$DEBUG"; then
+	echo "debug on"
+fi
+
+parse-boolean --strict -- "$FEATURE_FLAG" # exit 2 on a typo like "ture"
+parse-boolean --truthy si -- "$ACTIVO"    # extend the dictionary for this call
+```
+
+| Option            | Does                                                                     |
+| ----------------- | ------------------------------------------------------------------------ |
+| `-s`, `--strict`  | exit 2 on a string that is neither numeric nor in either dictionary      |
+| `-q`, `--quiet`   | print nothing; the exit code is the answer                               |
+| `--truthy <word>` | add a word to the truthy dictionary (repeatable)                         |
+| `--falsy <word>`  | add a word to the falsy dictionary (repeatable; matters with `--strict`) |
+| `--version`       | print the version                                                        |
+| `-h`, `--help`    | show usage                                                               |
+
+Put the value after `--`. A value starting with `-` (such as `-1`) is otherwise read as
+an option, which is exactly what an environment variable can contain.
+
+Note the exit code under `set -e`: `v=$(parse-boolean no)` exits the script, as `grep`
+would. Use `v=$(parse-boolean no || true)`, or the exit code alone.
+
 ## API
 
 ### `parseBoolean(value: unknown, options?: { strict?: boolean }): boolean`
@@ -147,6 +181,21 @@ Resets both truthy and falsy dictionaries to their defaults.
 
 Returns a fresh `parseBoolean` instance with its own isolated dictionaries.
 Has the same surface as the global `parseBoolean`.
+
+## Development
+
+Node LTS (`.node-version`), pnpm, Biome, `node:test`. The source is erasable-only
+TypeScript that Node runs directly; `dist/` is built only for publishing.
+
+| Command                             | Does                                               |
+| ----------------------------------- | -------------------------------------------------- |
+| `pnpm install`                      | installs the dev tooling                           |
+| `pnpm test` / `pnpm run test:watch` | `node --test` over `tests/**/*.test.ts`            |
+| `pnpm run typecheck`                | `tsc --noEmit` over `src` and `tests`              |
+| `pnpm run lint` / `pnpm run format` | `biome check .` read-only / with `--write`         |
+| `pnpm run ci`                       | typecheck + lint + test, what CI runs              |
+| `pnpm run build`                    | `tsc -p tsconfig.build.json` → `dist/`             |
+| `pnpm run rp` / `pnpm run rpm`      | patch / minor release, then publish to npm and JSR |
 
 ## Package Identity
 

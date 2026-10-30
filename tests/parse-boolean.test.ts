@@ -1,7 +1,8 @@
-import { assert, assertEquals, assertThrows } from "@std/assert";
+import assert from "node:assert/strict";
+import { test } from "node:test";
 import { createParseBoolean, parseBoolean } from "../src/parse-boolean.ts";
 
-Deno.test("TRUE", () => {
+test("TRUE", () => {
 	parseBoolean.reset();
 	[
 		{},
@@ -30,10 +31,12 @@ Deno.test("TRUE", () => {
 		"1.5",
 		".5",
 		"1e5",
-	].forEach((v) => assert(parseBoolean(v), `Expecting true for: '${v}'`));
+	].forEach((v) => {
+		assert.ok(parseBoolean(v), `Expecting true for: '${v}'`);
+	});
 });
 
-Deno.test("FALSE", () => {
+test("FALSE", () => {
 	parseBoolean.reset();
 	[
 		void 0,
@@ -55,136 +58,132 @@ Deno.test("FALSE", () => {
 		"0e5",
 		"1e-1000", // underflow -> 0
 		"\t0\n",
-	].forEach((v) => assert(!parseBoolean(v), `Expecting false for: '${v}'`));
+	].forEach((v) => {
+		assert.ok(!parseBoolean(v), `Expecting false for: '${v}'`);
+	});
 });
 
-Deno.test("Partial numeric strings are not truthy (bug fix)", () => {
+test("Partial numeric strings are not truthy (bug fix)", () => {
 	parseBoolean.reset();
-	["123abc", "1foo", "1.5.3", "0x1", "--1", "1 2"].forEach((v) =>
-		assert(!parseBoolean(v), `Expecting false for: '${v}'`)
-	);
+	["123abc", "1foo", "1.5.3", "0x1", "--1", "1 2"].forEach((v) => {
+		assert.ok(!parseBoolean(v), `Expecting false for: '${v}'`);
+	});
 });
 
-Deno.test("Non-finite numeric strings are not truthy", () => {
+test("Non-finite numeric strings are not truthy", () => {
 	parseBoolean.reset();
-	["Infinity", "-Infinity", "+Infinity", "NaN", "infinity"].forEach((v) =>
-		assert(!parseBoolean(v), `Expecting false for: '${v}'`)
-	);
+	["Infinity", "-Infinity", "+Infinity", "NaN", "infinity"].forEach((v) => {
+		assert.ok(!parseBoolean(v), `Expecting false for: '${v}'`);
+	});
 });
 
-Deno.test("Custom dictionary", () => {
+test("Custom dictionary", () => {
 	parseBoolean.reset();
-	assert(!parseBoolean("yo"));
+	assert.ok(!parseBoolean("yo"));
 	parseBoolean.addTruthy("yo");
-	assert(parseBoolean("yO"));
+	assert.ok(parseBoolean("yO"));
 	parseBoolean.reset();
 });
 
-Deno.test("addTruthy normalizes input", () => {
+test("addTruthy normalizes input", () => {
 	parseBoolean.reset();
 	parseBoolean.addTruthy("  SI  ");
-	assert(parseBoolean("si"));
-	assert(parseBoolean("SI"));
+	assert.ok(parseBoolean("si"));
+	assert.ok(parseBoolean("SI"));
 	parseBoolean.reset();
 });
 
-Deno.test("removeTruthy removes default and custom entries", () => {
+test("removeTruthy removes default and custom entries", () => {
 	parseBoolean.reset();
-	assert(parseBoolean("yes"));
+	assert.ok(parseBoolean("yes"));
 	parseBoolean.removeTruthy("yes");
-	assert(!parseBoolean("yes"));
+	assert.ok(!parseBoolean("yes"));
 
 	parseBoolean.addTruthy("oui");
-	assert(parseBoolean("oui"));
+	assert.ok(parseBoolean("oui"));
 	parseBoolean.removeTruthy("OUI");
-	assert(!parseBoolean("oui"));
+	assert.ok(!parseBoolean("oui"));
 
 	parseBoolean.reset();
-	assert(parseBoolean("yes"));
+	assert.ok(parseBoolean("yes"));
 });
 
-Deno.test("Reset dictionary", () => {
+test("Reset dictionary", () => {
 	parseBoolean.reset();
 	parseBoolean.addTruthy("custom");
-	assert(parseBoolean("custom"));
+	assert.ok(parseBoolean("custom"));
 	parseBoolean.reset();
-	assert(!parseBoolean("custom"));
-	assert(parseBoolean("yes"));
-	assert(parseBoolean("true"));
+	assert.ok(!parseBoolean("custom"));
+	assert.ok(parseBoolean("yes"));
+	assert.ok(parseBoolean("true"));
 });
 
-Deno.test("Strict mode: recognized truthy/falsy", () => {
+test("Strict mode: recognized truthy/falsy", () => {
 	parseBoolean.reset();
-	assertEquals(parseBoolean("yes", { strict: true }), true);
-	assertEquals(parseBoolean("no", { strict: true }), false);
-	assertEquals(parseBoolean("false", { strict: true }), false);
-	assertEquals(parseBoolean("off", { strict: true }), false);
-	assertEquals(parseBoolean("1", { strict: true }), true);
-	assertEquals(parseBoolean("0", { strict: true }), false);
+	assert.equal(parseBoolean("yes", { strict: true }), true);
+	assert.equal(parseBoolean("no", { strict: true }), false);
+	assert.equal(parseBoolean("false", { strict: true }), false);
+	assert.equal(parseBoolean("off", { strict: true }), false);
+	assert.equal(parseBoolean("1", { strict: true }), true);
+	assert.equal(parseBoolean("0", { strict: true }), false);
 });
 
-Deno.test("Strict mode: throws on unrecognized", () => {
+test("Strict mode: throws on unrecognized", () => {
 	parseBoolean.reset();
-	assertThrows(
-		() => parseBoolean("maybe", { strict: true }),
-		TypeError,
-	);
-	assertThrows(
-		() => parseBoolean("123abc", { strict: true }),
-		TypeError,
-	);
+	assert.throws(() => parseBoolean("maybe", { strict: true }), TypeError);
+	assert.throws(() => parseBoolean("123abc", { strict: true }), TypeError);
 });
 
-Deno.test("Strict mode: non-strings still use truthy coercion", () => {
+test("Strict mode: non-strings still use truthy coercion", () => {
 	parseBoolean.reset();
-	assertEquals(parseBoolean({}, { strict: true }), true);
-	assertEquals(parseBoolean(null, { strict: true }), false);
-	assertEquals(parseBoolean(0, { strict: true }), false);
+	assert.equal(parseBoolean({}, { strict: true }), true);
+	assert.equal(parseBoolean(null, { strict: true }), false);
+	assert.equal(parseBoolean(0, { strict: true }), false);
 });
 
-Deno.test("addFalsy / removeFalsy affect strict mode", () => {
+test("addFalsy / removeFalsy affect strict mode", () => {
 	parseBoolean.reset();
-	assertThrows(() => parseBoolean("nope", { strict: true }), TypeError);
+	assert.throws(() => parseBoolean("nope", { strict: true }), TypeError);
 
 	parseBoolean.addFalsy("nope");
-	assertEquals(parseBoolean("nope", { strict: true }), false);
-	assertEquals(parseBoolean("NOPE", { strict: true }), false);
+	assert.equal(parseBoolean("nope", { strict: true }), false);
+	assert.equal(parseBoolean("NOPE", { strict: true }), false);
 
 	parseBoolean.removeFalsy("nope");
-	assertThrows(() => parseBoolean("nope", { strict: true }), TypeError);
+	assert.throws(() => parseBoolean("nope", { strict: true }), TypeError);
 
 	parseBoolean.reset();
 });
 
-Deno.test("Factory instances are isolated", () => {
+test("Factory instances are isolated", () => {
 	const a = createParseBoolean();
 	const b = createParseBoolean();
 
 	a.addTruthy("si");
-	assert(a("si"));
-	assert(!b("si"));
+	assert.ok(a("si"));
+	assert.ok(!b("si"));
 
 	b.addTruthy("oui");
-	assert(b("oui"));
-	assert(!a("oui"));
+	assert.ok(b("oui"));
+	assert.ok(!a("oui"));
 
 	a.reset();
-	assert(!a("si"));
-	assert(b("oui"));
+	assert.ok(!a("si"));
+	assert.ok(b("oui"));
 });
 
-Deno.test("Factory instances are isolated from global", () => {
+test("Factory instances are isolated from global", () => {
 	parseBoolean.reset();
 	const local = createParseBoolean();
 	local.addTruthy("si");
-	assert(local("si"));
-	assert(!parseBoolean("si"));
+	assert.ok(local("si"));
+	assert.ok(!parseBoolean("si"));
 });
 
-Deno.test("addTruthy / reset return void (no internal Set leak)", () => {
+test("addTruthy / reset return void (no internal Set leak)", () => {
 	parseBoolean.reset();
 	const addResult = parseBoolean.addTruthy("x");
 	const resetResult = parseBoolean.reset();
-	assertEquals(addResult, undefined);
-	assertEquals(resetResult, undefined);
+	assert.equal(addResult, undefined);
+	assert.equal(resetResult, undefined);
 });

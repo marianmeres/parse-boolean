@@ -1,2 +1,4 @@
-Parses any value to boolean with intelligent string handling — recognizes 
+Parses any value to boolean with intelligent string handling — recognizes
 "yes", "true", "on", "enabled", etc. Useful for config files, env vars, and form values.
+Optional strict mode throws on unrecognized strings; dictionaries are extensible.
+Also ships a `parse-boolean` CLI (npm): prints true/false, exit code 0/1 (2 on error).
